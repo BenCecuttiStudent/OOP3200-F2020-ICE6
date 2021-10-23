@@ -1,3 +1,6 @@
+// Author: Ben Cecutti
+// Date: 22 October 2021
+// OOP 3200
 #include <iomanip>
 #include <iostream>
 #include <map>
