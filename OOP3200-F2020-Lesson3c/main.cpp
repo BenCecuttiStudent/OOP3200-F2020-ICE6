@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <iostream>
-
+#include <map>
+#include <fstream>
 #include <vector>
 
 #include "GameObject.h"
@@ -47,11 +48,91 @@ static void CompareGameObjects(GameObject* object1, GameObject* object2)
 	std::cout << object2->ToString() << std::endl;
 }
 
+void PrintGameObjects(const std::map<std::string, GameObject*>& game_objects)
+{
+	std::cout << "=================================" << std::endl;
+	std::cout << " Output map of Game Objects      " << std::endl;
+	std::cout << "=================================" << std::endl;
 
+	// for every game_object in gameObjects
+	for (const auto& game_object : game_objects)
+	{
+		std::cout << "Key  : " << game_object.first << std::endl;
+		std::cout << "---------------------------------" << std::endl;
+		std::cout << game_object.second->ToString();
+		std::cout << "---------------------------------\n" << std::endl;
+	}
+}
 
 int main()
 {
-	std::vector<GameObject*> gameObjects;
+	// map is made up of key value pairs - the key is a string
+	// and the value is a GameObject
+	std::map<std::string, GameObject*> gameObjects;
+
+	auto* ship = new GameObject("Ship", 0, 3.0f, 4.0f);
+	auto* enemy = new GameObject("Enemy", 1, 10.0f, 20.0f);
+	auto* space_station = new GameObject("SpaceStation", 2, 100.0f, 200.0f);
+
+	std::string fileName = "GameObject.txt";
+
+	gameObjects[ship->GetName()] = ship;
+	gameObjects[enemy->GetName()] = enemy;
+	gameObjects[space_station->GetName()] = space_station;
+
+	PrintGameObjects(gameObjects);
+
+	auto distance = Vector2D<float>::Distance(ship->GetPosition(), enemy->GetPosition());
+	std::cout << "Distance between " << gameObjects["Ship"]->GetName() << " and " << gameObjects["Enemy"]->GetName() << " is: " << std::to_string(distance) << std::endl << std::endl;
+
+
+	std::ofstream outfile(fileName.c_str(), std::ios::out);
+	outfile << gameObjects["Ship"]->ToFile() << std::endl;
+	outfile << gameObjects["Enemy"]->ToFile() << std::endl;
+	outfile << gameObjects["SpaceStation"]->ToFile() << std::endl;
+	outfile.close();
+
+
+	std::cout << "=================================" << std::endl;
+	std::cout << "         Beginning Input         " << std::endl;
+	std::cout << "=================================" << std::endl;
+
+	std::ifstream infile;
+	
+	infile.open(fileName.c_str());
+
+	if (infile.is_open())
+	{
+		int id;
+		float x, y;
+		std::string name;
+
+		while (!infile.fail())
+		{
+			infile >> id >> name;
+			infile.ignore(1, ' ');
+			infile.ignore(1, '(');
+			infile >> x;
+			infile.ignore(1, ',');
+			infile.ignore(1, ' ');
+			infile >> y;
+			infile.ignore(1, ')');
+
+			auto* temp_object = new GameObject(name, id, x, y);
+
+			gameObjects[name + " 1"] = temp_object;
+		}
+		infile.close();
+	}
+	std::cout << "=================================" << std::endl;
+	std::cout << "          Ending Input           " << std::endl;
+	std::cout << "=================================" << std::endl;
+
+
+	PrintGameObjects(gameObjects);
+	
+
+	/*std::vector<GameObject*> gameObjects;
 
 	int num_of_GO;
 	std::cout << "How Many Game Objects do you need?: ";
@@ -71,6 +152,5 @@ int main()
 	std::cout << "\n--------------------------------------------------------------" << std::endl;
 	
 	CompareGameObjects(gameObjects[index1], gameObjects[index2]);
-	CompareGameObjects(gameObjects[index1], gameObjects[index2]);
+	CompareGameObjects(gameObjects[index1], gameObjects[index2]);*/
 }
-
